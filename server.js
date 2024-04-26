@@ -78,15 +78,23 @@ app.post('/registro-usuario', indexController.handleRegistroUsuario);
 app.post('/login-usuario', logincontroller.handleLogin);
 
 app.post('/api/vehiculosmod/:id', async (req, res) => {
-    const { vehiculoId,color, costos, disponible, placas, foto } = req.body;
+    const vehiculoId = req.params.id;
+    const { formData } = req.body; // Obtenemos los datos de formData
+    const { años, puertas, transmision, marca, modelo, tipoVehiculo, color, combustible, disponible, precio, placas } = formData; // Desestructuramos los datos
+    
     try {
-        ModifiCarscontroller(req.body);
+        console.log('Datos recibidos en el servidor:', formData);
+        console.log('ID del vehiculo recibida en el server: ',vehiculoId)
+        await ModifiCarscontroller.handleUpdate({ vehiculoID: vehiculoId, reqBody: formData });
         res.status(200).json({ message: 'Detalles del vehículo actualizados correctamente.' });
     } catch (error) {
         console.error('Error al actualizar los detalles del vehículo:', error);
         res.status(500).json({ error: 'Error al actualizar los detalles del vehículo.' });
     }
 });
+
+
+
 app.post('/api/renta_vehiculo', async (req, res) => {
     try {
         const { vehiculoId, formData } = req.body; 

@@ -85,77 +85,103 @@
         });
     // Función para manejar el clic en el botón de "Modificar"
     $(document).on('click', '.rentar-btn', function() {
-        console.log('Botón de modificar clickeado');
-        var vehiculoId = $(this).data('id');
-        console.log('Id del vehiculo al click: ', vehiculoId);
-        Swal.fire({
-            title: 'Modificar Vehículo',
-            html:
-                '<input id="color" class="swal2-input" placeholder="Color">' +
-                '<input id="costos" class="swal2-input" placeholder="Costos">' +
-                '<select id="disponible" class="swal2-select">' +
-                '<option value="Si">Disponible</option>' +
-                '<option value="No">No disponible</option>' +
-                '</select>' +
-                '<input id="placas" class="swal2-input" placeholder="Placas">' +
-                '<input type="file" id="foto" class="swal2-file">',
-            focusConfirm: false,
-            showCancelButton: true,
-            confirmButtonText: 'Guardar',
-            cancelButtonText: 'Cancelar',
-            preConfirm: () => {
-                const color = Swal.getPopup().querySelector('#color').value;
-                const costos = Swal.getPopup().querySelector('#costos').value;
-                const disponible = Swal.getPopup().querySelector('#disponible').value === 'true';
-                const placas = Swal.getPopup().querySelector('#placas').value;
-                const foto = Swal.getPopup().querySelector('#foto').files[0]; // Obtenemos el archivo de la imagen
+    console.log('Botón de modificar clickeado');
+    var vehiculoId = $(this).data('id');
+    console.log('Id del vehiculo al click: ', vehiculoId);
+    Swal.fire({
+        title: 'Modificar Vehículo',
+        html:
+            '<input id="años" class="swal2-input" placeholder="Años">' +
+            '<select id="puertas" class="swal2-select">' +
+            '<option value="2">2 puertas</option>' +
+            '<option value="4">4 puertas</option>' +
+            '</select>' +
+            '<select id="transmision" class="swal2-select">' +
+            '<option value="Manual">Manual</option>' +
+            '<option value="Automático">Automático</option>' +
+            '</select>' +
+            '<input id="placas" class="swal2-input" placeholder="Placas">' +
+            '<input id="marca" class="swal2-input" placeholder="Marca">' +
+            '<input id="modelo" class="swal2-input" placeholder="Modelo">' +
+            '<select id="tipoVehiculo" class="swal2-select">' +
+            '<option value="SUV">SUV</option>' +
+            '<option value="Sédan">Sédan</option>' +
+            '<option value="Pickup">Pickup</option>' +
+            '<option value="Camioneta">Camioneta</option>' +
+            '<option value="Deportivo">Deportivo</option>' +
+            '</select>' +
+            '<input id="color" class="swal2-input" placeholder="Color">' +
+            '<select id="combustible" class="swal2-select">' +
+            '<option value="Gasolina">Gasolina</option>' +
+            '<option value="Diesel">Diesel</option>' +
+            '<option value="Eléctrico">Eléctrico</option>' +
+            '<option value="Híbrido">Híbrido</option>' +
+            '</select>' +
+            '<select id="disponible" class="swal2-select">' +
+            '<option value="Si">Disponible</option>' +
+            '<option value="No">No disponible</option>' +
+            '</select>' +
+            '<input id="precio" class="swal2-input" placeholder="Precio">',
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Guardar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+            const años = Swal.getPopup().querySelector('#años').value;
+            const puertas = Swal.getPopup().querySelector('#puertas').value;
+            const transmision = Swal.getPopup().querySelector('#transmision').value;
+            const placas = Swal.getPopup().querySelector('#placas').value;
+            const marca = Swal.getPopup().querySelector('#marca').value;
+            const modelo = Swal.getPopup().querySelector('#modelo').value;
+            const tipoVehiculo = Swal.getPopup().querySelector('#tipoVehiculo').value;
+            const color = Swal.getPopup().querySelector('#color').value;
+            const combustible = Swal.getPopup().querySelector('#combustible').value;
+            const disponible = Swal.getPopup().querySelector('#disponible').value === 'Si'; // Cambiado de 'true' a 'Si'
+            const precio = Swal.getPopup().querySelector('#precio').value;
 
-                // Validar los datos ingresados
-                if (!color || !costos || !placas) {
-                    Swal.showValidationMessage('Por favor, completa todos los campos obligatorios');
+            // Validar los datos ingresados
+            if (!años || !puertas || !transmision || !placas || !marca || !modelo || !tipoVehiculo || !color || !combustible || !precio) {
+                Swal.showValidationMessage('Por favor, completa todos los campos obligatorios');
+            } else {
+                console.log('Datos del formulario: ', { años, puertas, transmision, placas, marca, modelo, tipoVehiculo, color, combustible, disponible, precio });
+                return { años, puertas, transmision, placas, marca, modelo, tipoVehiculo, color, combustible, disponible, precio };
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            console.log('Modificar vehículo con ID:', vehiculoId);
+            console.log('Datos del formulario:', result.value); 
+            
+            $.ajax({
+                url: '/api/vehiculosmod/' + vehiculoId,
+                method: 'POST', // Cambiar el método a POST
+                contentType: 'application/json',
+                data: JSON.stringify({ vehiculoId: vehiculoId, formData: result.value }), // Corregido el typo en 'vehiculoId'
+                success: function(response) {
+                    Swal.fire(
+                        '¡Modificado!',
+                        'Los detalles del vehículo han sido actualizados correctamente.',
+                        'success'
+                    ).then(() => {
+                        // Recargar la página para mostrar los cambios actualizados
+                        location.reload();
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error al modificar el vehículo:', error);
+                    Swal.fire(
+                        'Error',
+                        'Hubo un error al modificar el vehículo.',
+                        'error'
+                    );
                 }
+            });
 
-                // Retornar los datos ingresados por el usuario
-                return { color, costos, disponible, placas, foto };
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Crear un FormData para enviar los datos y la imagen al servidor
-                var formData = new FormData();
-                formData.append('color', result.value.color);
-                formData.append('costos', result.value.costos);
-                formData.append('disponible', result.value.disponible);
-                formData.append('placas', result.value.placas);
-                formData.append('foto', result.value.foto);
-                $.ajax({
-                    url: '/api/vehiculosmod/' + vehiculoId,
-                    method: 'POST', // Cambiar el método a POST
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        Swal.fire(
-                            '¡Modificado!',
-                            'Los detalles del vehículo han sido actualizados correctamente.',
-                            'success'
-                        ).then(() => {
-                            // Recargar la página para mostrar los cambios actualizados
-                            location.reload();
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error al modificar el vehículo:', error);
-                        Swal.fire(
-                            'Error',
-                            'Hubo un error al modificar el vehículo.',
-                            'error'
-                        );
-                    }
-                });
-
-            }
-        });
+        }
     });
+});
+
+
 </script>
     </script>
 </body>

@@ -1,62 +1,195 @@
 //ModifiCarsmodel.js
 const db = require('../config'); // Importa el módulo para interactuar con la base de datos
 
-async function updatePlacas(vehiculoId, nuevasPlacas) {
+async function obtenerIdsRelacionadas(vehiculoId) {
     try {
-        await db.query('UPDATE Placas SET Numero = ? WHERE PlacasID = (SELECT PlacasID FROM Vehiculos WHERE VehiculoID = ?)', [nuevasPlacas, vehiculoId]);
-        return true; // Indica que la actualización fue exitosa
+        const queryString = `SELECT TipoVehiculoID, ColorID, CombustibleID, TransmisionID, PlacasID, ModeloID, MarcaID, AnoID, PuertasID FROM Vehiculos WHERE VehiculoID = '${vehiculoId}'`;
+        const result = await db.query(queryString);
+        if (result.length > 0) {
+            const idsRelacionadas = {
+                TipoVehiculoID: result[0].TipoVehiculoID,
+                ColorID: result[0].ColorID,
+                CombustibleID: result[0].CombustibleID,
+                TransmisionID: result[0].TransmisionID,
+                PlacasID: result[0].PlacasID,
+                ModeloID: result[0].ModeloID,
+                MarcaID: result[0].MarcaID,
+                AnoID: result[0].AnoID,
+                PuertasID: result[0].PuertasID
+            };
+            return idsRelacionadas;
+        } else {
+            return null;
+        }
     } catch (error) {
-        console.error('Error al actualizar las placas del vehículo:', error);
-        return false; // Indica que ocurrió un error durante la actualización
+        console.error('Error al obtener IDs relacionadas:', error);
+        throw error; // Relanza el error para que el controlador pueda manejarlo
     }
 }
 
-// Función para actualizar la ruta de la imagen de un vehículo
-async function updateRutaImagen(vehiculoId, nuevaRutaImagen) {
+
+async function actualizarTipoVehiculo(tipoVehiculoID, nuevoTipo) {
     try {
-        await db.query('UPDATE Vehiculos SET ruta_imagen = ? WHERE VehiculoID = ?', [nuevaRutaImagen, vehiculoId]);
-        return true; // Indica que la actualización fue exitosa
+        const query = `UPDATE TipoVehiculo SET Tipo = @NuevoTipo WHERE TipoVehiculoID = @TipoVehiculoID`;
+        const result = await db.query(query, {
+            NuevoTipo: nuevoTipo,
+            TipoVehiculoID: tipoVehiculoID
+        });
+
+        return result;
     } catch (error) {
-        console.error('Error al actualizar la ruta de la imagen del vehículo:', error);
-        return false; // Indica que ocurrió un error durante la actualización
-    }
-}
-async function updateColor(vehiculoId, nuevoColor) {
-    try {
-        await db.query('UPDATE Color SET Color = ? WHERE ColorID = (SELECT ColorID FROM Vehiculos WHERE VehiculoID = ?)', [nuevoColor, vehiculoId]);
-        return true; // Indica que la actualización fue exitosa
-    } catch (error) {
-        console.error('Error al actualizar el color del vehículo:', error);
-        return false; // Indica que ocurrió un error durante la actualización
-    }
-}
-// Función para actualizar el costo de un vehículo
-async function updateCostos(vehiculoId, nuevosCostos) {
-    try {
-        await db.query('UPDATE Vehiculos SET Costos = ? WHERE VehiculoID = ?', [nuevosCostos, vehiculoId]);
-        return true; // Indica que la actualización fue exitosa
-    } catch (error) {
-        console.error('Error al actualizar los costos del vehículo:', error);
-        return false; // Indica que ocurrió un error durante la actualización
+        throw new Error('Error al actualizar el tipo de vehículo:', error);
     }
 }
 
-// Función para actualizar la disponibilidad de un vehículo
-async function updateDisponible(vehiculoId, nuevaDisponibilidad) {
+async function actualizarColor(colorID, nuevoColor) {
     try {
-        await db.query('UPDATE Vehiculos SET Disponible = ? WHERE VehiculoID = ?', [nuevaDisponibilidad, vehiculoId]);
-        return true; // Indica que la actualización fue exitosa
+        const query = `UPDATE Color SET Color = @NuevoColor WHERE ColorID = @ColorID`;
+        const result = await db.query(query, {
+            NuevoColor: nuevoColor,
+            ColorID: colorID
+        });
+
+        return result;
     } catch (error) {
-        console.error('Error al actualizar la disponibilidad del vehículo:', error);
-        return false; // Indica que ocurrió un error durante la actualización
+        throw new Error('Error al actualizar el color:', error);
     }
 }
 
+async function actualizarCombustible(CombustibleID, Tipo) {
+    try {
+        const query = `UPDATE Combustible SET Tipo = @Tipo WHERE CombustibleID = @CombustibleID`;
+        const result = await db.query(query, {
+            Tipo: Tipo,
+            CombustibleID: CombustibleID
+        });
+
+        return result;
+    } catch (error) {
+        throw new Error('Error al actualizar el color:', error);
+    }
+}
+
+async function actualizarTransmision(TransmisionID, Nombre) {
+    try {
+        const query = `UPDATE Transimision SET Nombre = @Nombre WHERE TransmisionID = @TransmisionID`;
+        const result = await db.query(query, {
+            Nombre: Nombre,
+            TransmisionID: TransmisionID
+        });
+
+        return result;
+    } catch (error) {
+        throw new Error('Error al actualizar el color:', error);
+    }
+}
+
+async function actualizarPlacas(PlacasID, Numero) {
+    try {
+        const query = `UPDATE Placas SET Numero = @Numero WHERE PlacasID = @PlacasID`;
+        const result = await db.query(query, {
+            Numero: Numero,
+            PlacasID: PlacasID
+        });
+
+        return result;
+    } catch (error) {
+        throw new Error('Error al actualizar el color:', error);
+    }
+}
+
+async function actualizarModelo(ModeloID, Nombre) {
+    try {
+        const query = `UPDATE Modelo SET Nombre = @Nombre WHERE ModeloID = @ModeloID`;
+        const result = await db.query(query, {
+            Nombre: Nombre,
+            ModeloID: ModeloID
+        });
+
+        return result;
+    } catch (error) {
+        throw new Error('Error al actualizar el color:', error);
+    }
+}
+
+async function actualizarMarca(MarcaID, Nombre) {
+    try {
+        const query = `UPDATE Marca SET Nombre = @Nombre WHERE MarcaID = @MarcaID`;
+        const result = await db.query(query, {
+            Nombre: Nombre,
+            MarcaID: MarcaID
+        });
+
+        return result;
+    } catch (error) {
+        throw new Error('Error al actualizar el color:', error);
+    }
+}
+
+async function actualizarAno(AnoID, Anos) {
+    try {
+        const query = `UPDATE Anos SET Anos = @Anos WHERE AnoID = @AnoID`;
+        const result = await db.query(query, {
+            Anos: Anos,
+            AnoID: AnoID
+        });
+
+        return result;
+    } catch (error) {
+        throw new Error('Error al actualizar el color:', error);
+    }
+}
+
+async function actualizarPuertas(PuertasID, Puertas) {
+    try {
+        const query = `UPDATE Puertas SET Puertas = @Puertas WHERE PuertasID = @PuertasID`;
+        const result = await db.query(query, {
+            Puertas: Puertas,
+            PuertasID: PuertasID
+        });
+
+        return result;
+    } catch (error) {
+        throw new Error('Error al actualizar el color:', error);
+    }
+}
+
+async function actualizarCostosYDisponibilidad(vehiculoID, nuevosCostos, nuevaDisponibilidad) {
+    try {
+        console.log('Disponibilidad del vehiculo: ',nuevaDisponibilidad);
+        var disponible;
+        if (nuevaDisponibilidad === true) {
+            disponible = 'Si';
+        } else {
+            disponible = 'No';
+        }
+        const query = `
+            UPDATE Vehiculos 
+            SET Costos = @NuevosCostos, Disponible = @disponible 
+            WHERE VehiculoID = @VehiculoID
+        `;
+        const result = await db.query(query, {
+            NuevosCostos: nuevosCostos,
+            disponible: disponible,
+            VehiculoID: vehiculoID
+        });
+
+        return result;
+    } catch (error) {
+        throw new Error('Error al actualizar los costos y la disponibilidad:', error);
+    }
+}
 
 module.exports = {
-    updateColor,
-    updateCostos,
-    updateDisponible,
-    updatePlacas,
-    updateRutaImagen
+    obtenerIdsRelacionadas,
+    actualizarTipoVehiculo,
+    actualizarColor,
+    actualizarCombustible,
+    actualizarTransmision,
+    actualizarPlacas,
+    actualizarModelo,
+    actualizarMarca,
+    actualizarAno,
+    actualizarPuertas,
+    actualizarCostosYDisponibilidad
 };
