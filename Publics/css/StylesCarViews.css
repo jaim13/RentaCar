@@ -1,0 +1,117 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 50px;
+    font-weight: 600;
+    margin-left: 200px;
+    color: #343a40;
+}
+
+.list-group-item {
+    background-color: #fff;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para la imagen */
+.list-group-item img {
+    max-width: 100px;
+    border-radius: 8px;
+    margin-right: 20px;
+}
+
+.rentar-btn {
+    margin-top: 10px;
+}
+
+/* Estilos para el modal de modificar */
+.swal2-popup {
+    font-family: 'Arial', sans-serif;
+}
+
+.swal2-title {
+    color: #343a40;
+}
+
+.swal2-input,
+.swal2-select,
+.swal2-file {
+    margin-bottom: 10px;
+}
+
+.swal2-file input[type="file"] {
+    border: none;
+    border-radius: 4px;
+    padding: 10px;
+    background-color: #f8f9fa;
+}
+
+.swal2-file input[type="file"]:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Estilos para el botón de guardar en el modal */
+.swal2-confirm {
+    background-color: #0d6efd;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+}
+
+.swal2-confirm:hover {
+    background-color: #0b5ed7;
+}
+
+/* Estilos para el botón de cancelar en el modal */
+.swal2-cancel {
+    background-color: #6c757d;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+}
+
+.swal2-cancel:hover {
+    background-color: #5a6268;
+}
+/* Estilos específicos para los detalles de cada vehículo */
+.vehiculo-details {
+    padding: 20px;
+    border-top: 1px solid #dee2e6;
+}
+
+.vehiculo-details strong {
+    font-weight: bold;
+    color: #495057;
+}
+
+.vehiculo-details p {
+    margin-bottom: 5px;
+}
+
+.rentar-btn {
+    margin-top: 20px;
+    padding: 5px 100px;
+    font-size: 18px; 
+}
+
+.list-group-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 15px;
+    margin-top: 100px;
+    margin-right: 0; 
+}
+
