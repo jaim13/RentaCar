@@ -98,7 +98,7 @@ app.post('/api/vehiculosmod/:id', async (req, res) => {
 app.post('/api/renta_vehiculo', async (req, res) => {
     try {
         const { vehiculoId, formData } = req.body; 
-        const { cedula, numeroTarjeta, seguroRenta, tipoTarjeta, tiempoRenta } = formData;
+        const { cedula, email, numeroTarjeta, seguroRenta, tipoTarjeta, tiempoRenta } = formData;
 
         console.log('VehiculoID en el server: ', vehiculoId);
         console.log('FormData en el server: ', formData);
@@ -132,11 +132,6 @@ app.post('/insert-autos', upload.single('imagen'), (req, res, next) => {
     
     // Construye la ruta absoluta del archivo
     const imagePath = path.resolve(__dirname, req.file.path);
-
-    // No envíes la imagen al cliente
-    // res.sendFile(imagePath);
-
-    // Llama a next() para pasar al siguiente middleware (el controlador)
     next();
 }, addcarcontroller.handleInsertCarData);
 

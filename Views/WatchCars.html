@@ -108,6 +108,7 @@
         title: 'Rentar Vehículo',
         html:
             '<input id="cedula" class="swal2-input" placeholder="Cedula">' +
+            '<input id="email" class="swal2-input" placeholder="Email">' +
             '<input id="numero-tarjeta" class="swal2-input" placeholder="Número de Tarjeta">' +
             '<input id="fecha-renta" type="date" class="swal2-input">' +
             '<select id="seguro-renta" class="swal2-select">' +
@@ -126,6 +127,7 @@
         cancelButtonText: 'Cancelar',
         preConfirm: () => {
             const cedula = Swal.getPopup().querySelector('#cedula').value;
+            const email = Swal.getPopup().querySelector('#email').value;
             const numeroTarjeta = Swal.getPopup().querySelector('#numero-tarjeta').value;
             const fechaRenta = Swal.getPopup().querySelector('#fecha-renta').value;
             const seguroRenta = Swal.getPopup().querySelector('#seguro-renta').value;
@@ -134,11 +136,11 @@
             console.log('Número de Tarjeta:', numeroTarjeta);
             console.log('Fecha de renta:', fechaRenta);
             console.log('Seguro de renta:', seguroRenta);
-            if (!cedula || !numeroTarjeta || !fechaRenta || !seguroRenta || !tipoTarjeta) {
+            if (!cedula || !email || !numeroTarjeta || !fechaRenta || !seguroRenta || !tipoTarjeta) {
                 Swal.showValidationMessage('Por favor, completa todos los campos');
             } else {
-                console.log('Datos del formulario: Cedula:', cedula, 'Número de Tarjeta:', numeroTarjeta, 'Fecha de renta:', fechaRenta, 'Seguro de renta:', seguroRenta, 'Tipo de Tarjeta:', tipoTarjeta);
-                return { cedula: cedula, numeroTarjeta: numeroTarjeta, fechaRenta: fechaRenta, seguroRenta: seguroRenta, tipoTarjeta: tipoTarjeta };
+                console.log('Datos del formulario: Cedula:', cedula,'Email para enviar correo:',email, 'Número de Tarjeta:', numeroTarjeta, 'Fecha de renta:', fechaRenta, 'Seguro de renta:', seguroRenta, 'Tipo de Tarjeta:', tipoTarjeta);
+                return { cedula: cedula,email: email, numeroTarjeta: numeroTarjeta, fechaRenta: fechaRenta, seguroRenta: seguroRenta, tipoTarjeta: tipoTarjeta };
             }
         }
     }).then((result) => {
@@ -156,7 +158,10 @@
                         'Rentado!',
                         'El vehículo ha sido rentado con éxito.',
                         'success'
-                    );
+                        ).then(() => {
+                        // Recargar la página para mostrar los cambios actualizados
+                        location.reload();
+                    });
                 },
                 error: function(xhr, status, error) {
                     console.error('Error al rentar el vehículo:', error);
