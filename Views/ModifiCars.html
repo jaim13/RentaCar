@@ -10,6 +10,27 @@
 
 </head>
 <body>
+    <header class="mb-5">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/admin">
+                    RentaCar 
+                    <i class="bi bi-car"></i>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="navbar-nav">
+                    <a class="nav-link active" aria-current="page" href="/AddCars">Ingresar Vehiculo</a>
+                    <a class="nav-link" href="/WatchCars">Ver Vehiculos</a>
+                    <a class="nav-link" href="/Modi">Modificar Vehiculos</a>
+                    <a class="nav-link" href="/Back">Devolver Vehiculos</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
     <div class="container mt-5">
         <h1 class="mb-4">Tus Vehículos</h1>
         <ul id="listaVehiculos" class="list-group">
@@ -151,7 +172,7 @@
         if (result.isConfirmed) {
             console.log('Modificar vehículo con ID:', vehiculoId);
             console.log('Datos del formulario:', result.value); 
-            
+            Views/ModifiCars.html
             $.ajax({
                 url: '/api/vehiculosmod/' + vehiculoId,
                 method: 'POST', // Cambiar el método a POST

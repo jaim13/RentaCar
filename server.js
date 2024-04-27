@@ -20,9 +20,10 @@ const storage = multer.diskStorage({
 const indexController = require('./Controllers/indexcontroller');
 const logincontroller = require('./Controllers/logincontroller');
 const addcarcontroller = require('./Controllers/addcarcontroller');
-const WatchCarController = require('./Controllers/WatchCarController')
-const rentaVehiculosController = require('./Controllers/rentavehiculoscontroller')
-const ModifiCarscontroller = require('./Controllers/ModifiCarscontroller')
+const WatchCarController = require('./Controllers/WatchCarController');
+const rentaVehiculosController = require('./Controllers/rentavehiculoscontroller');
+const ModifiCarscontroller = require('./Controllers/ModifiCarscontroller');
+const TakeBackcontroller = require('./Controllers/CarsBackcontroller');
 
 const app = express();
 const router = express.Router();
@@ -51,6 +52,9 @@ app.use('/uploads', express.static('uploads'));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'Views', 'index.html'));
+});
+app.get('/Back', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Views', 'CarsBack.html'));
 });
 app.get('/Client', (req, res) => {
     res.sendFile(path.join(__dirname, 'Views', 'client.html'));
@@ -93,6 +97,24 @@ app.post('/api/vehiculosmod/:id', async (req, res) => {
     }
 });
 
+app.post('/api/devolver-vehiculo', async (req, res) => {
+    const vehiculoID = req.body.vehiculoID;
+
+    try {
+        await TakeBackcontroller.handleTakeBack(vehiculoID);
+
+        // Si la función handleTakeBack se ejecuta sin errores, enviar una respuesta exitosa
+        const response = {
+            success: true,
+            message: `El vehículo con ID ${vehiculoID} ha sido devuelto exitosamente.`
+        };
+        res.json(response);
+    } catch (error) {
+        // Si ocurre un error, enviar una respuesta de error
+        console.error('Error al devolver el vehículo:', error);
+        res.status(500).json({ success: false, message: 'Se produjo un error al devolver el vehículo.' });
+    }
+});
 
 
 app.post('/api/renta_vehiculo', async (req, res) => {
