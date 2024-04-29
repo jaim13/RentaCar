@@ -24,6 +24,7 @@ const WatchCarController = require('./Controllers/WatchCarController');
 const rentaVehiculosController = require('./Controllers/rentavehiculoscontroller');
 const ModifiCarscontroller = require('./Controllers/ModifiCarscontroller');
 const TakeBackcontroller = require('./Controllers/CarsBackcontroller');
+const WatchUserController = require('./Controllers/watchusercontroller');
 
 const app = express();
 const router = express.Router();
@@ -53,6 +54,10 @@ app.use('/uploads', express.static('uploads'));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'Views', 'index.html'));
 });
+app.get('/WatchUsers', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Views', 'WatchUsers.html'));
+});
+
 app.get('/Back', (req, res) => {
     res.sendFile(path.join(__dirname, 'Views', 'CarsBack.html'));
 });
@@ -76,6 +81,7 @@ app.get('/admin', (req, res) => {
 });
 
 app.get('/api/vehiculos', WatchCarController.getVehiculos);
+app.get('/api/users',WatchUserController.getUser)
 
 // Ruta POST para manejar el registro de usuarios
 app.post('/registro-usuario', indexController.handleRegistroUsuario);
