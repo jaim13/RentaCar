@@ -8,10 +8,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
-    <header>
+    <header class="mb-5">
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">
+                <a class="navbar-brand" href="/admin">
                     RentaCar 
                     <i class="bi bi-car"></i>
                 </a>
@@ -22,10 +22,13 @@
                     <div class="navbar-nav">
                     <a class="nav-link active" aria-current="page" href="/AddCars">Ingresar Vehiculo</a>
                     <a class="nav-link" href="/WatchCars">Ver Vehiculos</a>
-                    </div>
+                    <a class="nav-link" href="/Modi">Modificar Vehiculos</a>
+                    <a class="nav-link" href="/Back">Devolver Vehiculos</a>
+                    <a class="nav-link" href="/WatchUsers">Modificar Usuarios</a>
                 </div>
                 </div>
-            </nav>
+            </div>
+        </nav>
     </header>
     <div class="container mt-5">
         <div class="row">
@@ -71,9 +74,11 @@
                             <option value="pickup">Pickup</option>
                             <option value="camioneta">Camioneta</option>
                             <option value="deportivo">Deportivo</option>
+                            <option value="moto">Moto</option>
+                            <option value="cargaPesada">Carga pesada</option>
+                            <option value="van">Van</option>
                         </select>
                     </div>
-                    
                     <div class="mb-3">
                         <label for="color">Color:</label>
                         <input type="text" id="color" name="color" class="form-control">

@@ -91,6 +91,7 @@
                                 '<strong>Tipo de Vehículo:</strong> ' + vehiculo.TipoVehiculo + '<br>' +
                                 '<strong>Transmisión:</strong> ' + vehiculo.Transmision + '<br>' +
                                 '<button class="btn btn-primary rentar-btn" data-id="' + vehiculo.VehiculoID + '">Modificar</button>'+
+                                '<button class="btn btn-primary eliminar-btn" data-id="'+ vehiculo.VehiculoID +'">Eliminar</button>' +
                                 '</div>' +
                                 '</div>' +
                                 '</li>';
@@ -102,6 +103,35 @@
                 },
                 error: function(xhr, status, error) {
                     console.error('Error al obtener la lista de vehículos:', error);
+                }
+            });
+        });
+        $(document).on('click', '.eliminar-btn', function() {
+            var VehiculoID = $(this).data('id'); // Obtén el ID del carro del atributo data-id del botón
+            console.log('Id del boton eliminar: ',VehiculoID);
+            var CarroData = {
+                VehiculoID: VehiculoID
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/eliminar_carro',
+                data: CarroData,
+                success: function(response) {
+                    // Maneja la respuesta del servidor aquí
+                    console.log('Solicitud POST exitosa:', response);
+                    // Actualiza la página
+                    window.location.reload();
+                },
+                error: function(xhr, status, error) {
+                    // Maneja los errores aquí
+                    console.error('Error en la solicitud POST:', error);
+                    // Muestra una alerta de SweetAlert para informar sobre el error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un error al eliminar el auto. Por favor, inténtalo de nuevo más tarde.',
+                    });
                 }
             });
         });
@@ -131,6 +161,9 @@
             '<option value="Pickup">Pickup</option>' +
             '<option value="Camioneta">Camioneta</option>' +
             '<option value="Deportivo">Deportivo</option>' +
+            '<option value="Moto">Moto</option>' +
+            '<option value="Carga pesada">Carga pesada</option>' +
+            '<option value="Van">Van</option>' +
             '</select>' +
             '<input id="color" class="swal2-input" placeholder="Color">' +
             '<select id="combustible" class="swal2-select">' +
@@ -173,7 +206,6 @@
         if (result.isConfirmed) {
             console.log('Modificar vehículo con ID:', vehiculoId);
             console.log('Datos del formulario:', result.value); 
-            Views/ModifiCars.html
             $.ajax({
                 url: '/api/vehiculosmod/' + vehiculoId,
                 method: 'POST', // Cambiar el método a POST
@@ -185,8 +217,7 @@
                         'Los detalles del vehículo han sido actualizados correctamente.',
                         'success'
                     ).then(() => {
-                        // Recargar la página para mostrar los cambios actualizados
-                        location.reload();
+                        location.reload(); // Redireccionar o cargar la vista después de que la solicitud AJAX sea exitosa
                     });
                 },
                 error: function(xhr, status, error) {
@@ -198,7 +229,6 @@
                     );
                 }
             });
-
         }
     });
 });

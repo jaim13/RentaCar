@@ -25,6 +25,8 @@ const rentaVehiculosController = require('./Controllers/rentavehiculoscontroller
 const ModifiCarscontroller = require('./Controllers/ModifiCarscontroller');
 const TakeBackcontroller = require('./Controllers/CarsBackcontroller');
 const WatchUserController = require('./Controllers/watchusercontroller');
+const userModiController = require('./Controllers/usermodicontroller');
+const getsellsController = require('./Controllers/getsellscontroller');
 
 const app = express();
 const router = express.Router();
@@ -58,6 +60,11 @@ app.get('/WatchUsers', (req, res) => {
     res.sendFile(path.join(__dirname, 'Views', 'WatchUsers.html'));
 });
 
+app.get('/VehiculosClient', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Views', 'VerVehiculosClient.html'));
+});
+
+
 app.get('/Back', (req, res) => {
     res.sendFile(path.join(__dirname, 'Views', 'CarsBack.html'));
 });
@@ -80,6 +87,8 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'Views', 'admin.html'));
 });
 
+// Configurar las rutas
+app.get('/ventasDelDia', getsellsController.mostrarVentasDelDia);
 app.get('/api/vehiculos', WatchCarController.getVehiculos);
 app.get('/api/users',WatchUserController.getUser)
 
@@ -87,10 +96,48 @@ app.get('/api/users',WatchUserController.getUser)
 app.post('/registro-usuario', indexController.handleRegistroUsuario);
 app.post('/login-usuario', logincontroller.handleLogin);
 
+
+app.post('/api/modificar_usuario', async (req, res) => {
+    // Obtiene los datos del formulario del cuerpo de la solicitud
+    const { ID_Cliente, Ced_Cliente, Nombre, Apellido, TipoClienteID, LugarResidenciaID, Direccion, contrasena } = req.body;
+    try {
+        const result = await userModiController.actualizarCliente(req,res);
+        console.log('Usuario modificado con éxito:', result);
+        res.status(200).json({ success: true, message: 'Usuario modificado con éxito', data: result });
+    } catch (error) {
+        console.error('Error al modificar usuario:', error);
+        res.status(500).json({ success: false, message: 'Error al modificar usuario', error: error.message });
+    }
+});
+
+app.post('/eliminar_cliente', async (req, res) => {
+    try {
+        const { clienteId } = req.body; 
+        console.log('ID recibida en el server: ', clienteId);
+        const result = await userModiController.eliminarClientePorId(clienteId); 
+        res.status(200).json({ success: true, message: 'Cliente eliminado correctamente', data: result });
+    } catch (error) {
+        console.error('Error al eliminar cliente:', error);
+        res.status(500).json({ success: false, message: 'Error al eliminar cliente', error: error.message });
+    }
+});
+
+
+app.post('/eliminar_carro', async (req, res) => {
+    try {
+        const { VehiculoID } = req.body; 
+        console.log('ID recibida en el server: ', VehiculoID);
+        const result = await ModifiCarscontroller.eliminarCarroPorId(VehiculoID); 
+        res.status(200).json({ success: true, message: 'Carro eliminado correctamente', data: result });
+    } catch (error) {
+        console.error('Error al eliminar Carro:', error);
+        res.status(500).json({ success: false, message: 'Error al eliminar cliente', error: error.message });
+    }
+});
+
 app.post('/api/vehiculosmod/:id', async (req, res) => {
     const vehiculoId = req.params.id;
-    const { formData } = req.body; // Obtenemos los datos de formData
-    const { años, puertas, transmision, marca, modelo, tipoVehiculo, color, combustible, disponible, precio, placas } = formData; // Desestructuramos los datos
+    const formData = req.body; // Obtenemos los datos de formData
     
     try {
         console.log('Datos recibidos en el servidor:', formData);
@@ -102,6 +149,7 @@ app.post('/api/vehiculosmod/:id', async (req, res) => {
         res.status(500).json({ error: 'Error al actualizar los detalles del vehículo.' });
     }
 });
+
 
 app.post('/api/devolver-vehiculo', async (req, res) => {
     const vehiculoID = req.body.vehiculoID;

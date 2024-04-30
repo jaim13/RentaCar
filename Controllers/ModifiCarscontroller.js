@@ -4,8 +4,13 @@ const ModifiCarsModel = require('../Models/ModifiCarsmodel'); // Importa el mode
 
 // Función para manejar la solicitud POST para actualizar un vehículo
 async function handleUpdate({ vehiculoID, reqBody }) {
-    console.log('Id del vehiculo en el controller: ',vehiculoID);
+    console.log('Id del vehiculo en el controller:', vehiculoID);
     console.log('Datos recibidos en handleUpdate:', reqBody);
+    
+    // Acceder a los datos dentro de formData
+    const formData = reqBody.formData;
+    
+    // Desestructurar los datos dentro de formData
     const {
         años,
         puertas,
@@ -18,7 +23,21 @@ async function handleUpdate({ vehiculoID, reqBody }) {
         disponible,
         precio,
         placas
-    } = reqBody;
+    } = formData;
+
+    // Logs adicionales para verificar los valores después de la desestructuración
+    console.log('Valores después de la desestructuración:');
+    console.log('Años:', años);
+    console.log('Puertas:', puertas);
+    console.log('Transmisión:', transmision);
+    console.log('Marca:', marca);
+    console.log('Modelo:', modelo);
+    console.log('Tipo de Vehículo:', tipoVehiculo);
+    console.log('Color:', color);
+    console.log('Combustible:', combustible);
+    console.log('Disponible:', disponible);
+    console.log('Precio:', precio);
+    console.log('Placas:', placas);
 
     try {
         const idsRelacionadas = await ModifiCarsModel.obtenerIdsRelacionadas(vehiculoID);
@@ -37,6 +56,7 @@ async function handleUpdate({ vehiculoID, reqBody }) {
             } = idsRelacionadas;
             
             console.log('TipoVehiculoID:', TipoVehiculoID);
+            console.log('Tipo de vehiculo que actualiza: ',tipoVehiculo)
             resultTipo = await ModifiCarsModel.actualizarTipoVehiculo(TipoVehiculoID, tipoVehiculo);
             
             console.log('ColorID:', ColorID);
@@ -63,7 +83,8 @@ async function handleUpdate({ vehiculoID, reqBody }) {
             console.log('PuertasID:', PuertasID);
             resultPuertas = await ModifiCarsModel.actualizarPuertas(PuertasID, puertas);
             
-            resultCostosDispo = await ModifiCarsModel.actualizarCostosYDisponibilidad(vehiculoID, precio, disponible);
+            // Actualiza los costos y la disponibilidad del vehículo
+            await ModifiCarsModel.actualizarCostosYDisponibilidad(vehiculoID, precio, disponible);
 
             return 'Actualización exitosa.';
         } else {
@@ -77,7 +98,19 @@ async function handleUpdate({ vehiculoID, reqBody }) {
 }
 
 
+const eliminarCarroPorId = async (id) => { 
+    console.log('Id a eliminar en controller: ', id);
+    try {
+        const result = await ModifiCarsModel.eliminarCarPorId(id);
+        return result;
+    } catch (error) {
+        console.error('Error al eliminar cliente:', error);
+        return error;
+    }
+};
+
 module.exports = {
-    handleUpdate: handleUpdate
+    handleUpdate: handleUpdate,
+    eliminarCarroPorId: eliminarCarroPorId 
 };
 

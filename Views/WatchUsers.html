@@ -9,11 +9,12 @@
     <link rel="stylesheet" href="/css/StylesCarViews.css">
 </head>
 <body>
-    <header>
+    <header class="mb-5">
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">RentaCar
-                    <i class="fa-solid fa-car"></i>
+                <a class="navbar-brand" href="/admin">
+                    RentaCar 
+                    <i class="bi bi-car"></i>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -22,10 +23,13 @@
                     <div class="navbar-nav">
                     <a class="nav-link active" aria-current="page" href="/AddCars">Ingresar Vehiculo</a>
                     <a class="nav-link" href="/WatchCars">Ver Vehiculos</a>
-                    </div>
+                    <a class="nav-link" href="/Modi">Modificar Vehiculos</a>
+                    <a class="nav-link" href="/Back">Devolver Vehiculos</a>
+                    <a class="nav-link" href="/WatchUsers">Modificar Usuarios</a>
                 </div>
                 </div>
-            </nav>
+            </div>
+        </nav>
     </header>
     <div class="container mt-5">
         <h1 class="mb-4">Lista de Usuarios</h1>
@@ -52,6 +56,7 @@
                     '<strong>Lugar de Residencia:</strong> ' + cliente.LugarResidencia + '<br>' +
                     '<strong>Dirección:</strong> ' + cliente.Direccion + '<br>' +
                     '<button class="btn btn-primary modificar-btn" data-id="'+ cliente.ID_Cliente+'">Modificar</button>' +
+                    '<button class="btn btn-primary eliminar-btn" data-id="'+ cliente.ID_Cliente+'">Eliminar</button>' +
                     '</li>';
                 $('#listaClientes').append(clienteHTML);
             });
@@ -64,6 +69,34 @@
             console.error('Error al obtener la lista de clientes:', error);
         }
     });
+    $(document).on('click', '.eliminar-btn', function() {
+    var clienteId = $(this).data('id'); // Obtén el ID del cliente del atributo data-id del botón
+    console.log('Id del boton eliminar: ',clienteId);
+    var clienteData = {
+        clienteId: clienteId
+    };
+    $.ajax({
+        type: 'POST',
+        url: '/eliminar_cliente',
+        data: clienteData,
+        success: function(response) {
+            // Maneja la respuesta del servidor aquí
+            console.log('Solicitud POST exitosa:', response);
+            // Actualiza la página
+            window.location.reload();
+        },
+        error: function(xhr, status, error) {
+            // Maneja los errores aquí
+            console.error('Error en la solicitud POST:', error);
+            // Muestra una alerta de SweetAlert para informar sobre el error
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un error al eliminar el cliente. Por favor, inténtalo de nuevo más tarde.',
+            });
+        }
+    });
+});
     $(document).ready(function() {
     $('#listaClientes').on('click', '.modificar-btn', function() {
         console.log('Botón de modificar clickeado');
@@ -77,17 +110,27 @@
         var tipoCliente = $(this).closest('li').find('.tipo-cliente').text().trim();
         var lugarResidencia = $(this).closest('li').find('.lugar-residencia').text().trim();
         var direccion = $(this).closest('li').find('.direccion').text().trim();
-
-        // Mostrar el diálogo SweetAlert con los campos pre-cargados
         Swal.fire({
             title: 'Modificar Usuario',
             html:
                 '<input id="cedula" class="swal2-input" placeholder="Cédula" value="' + cedula + '">' +
                 '<input id="nombre" class="swal2-input" placeholder="Nombre" value="' + nombre + '">' +
                 '<input id="apellido" class="swal2-input" placeholder="Apellido" value="' + apellido + '">' +
-                '<input id="tipo-cliente" class="swal2-input" placeholder="Tipo de Cliente" value="' + tipoCliente + '">' +
-                '<input id="lugar-residencia" class="swal2-input" placeholder="Lugar de Residencia" value="' + lugarResidencia + '">' +
-                '<input id="direccion" class="swal2-input" placeholder="Dirección" value="' + direccion + '">',
+                '<select id="tipo-cliente" class="swal2-select" placeholder="Tipo de Cliente">' +
+                '<option value="1"' + (tipoCliente === 'Nacional' ? ' selected' : '') + '>Nacional</option>' +
+                '<option value="2"' + (tipoCliente === 'Extranjero' ? ' selected' : '') + '>Extranjero</option>' +
+                '</select>' +
+                '<select id="lugar-residencia" class="swal2-select" placeholder="Lugar de Residencia">' +
+                '<option value="1"' + (lugarResidencia === 'San José' ? ' selected' : '') + '>San José</option>' +
+                '<option value="2"' + (lugarResidencia === 'Alajuela' ? ' selected' : '') + '>Alajuela</option>' +
+                '<option value="3"' + (lugarResidencia === 'Cartago' ? ' selected' : '') + '>Cartago</option>' +
+                '<option value="4"' + (lugarResidencia === 'Heredia' ? ' selected' : '') + '>Heredia</option>' +
+                '<option value="5"' + (lugarResidencia === 'Guanacaste' ? ' selected' : '') + '>Guanacaste</option>' +
+                '<option value="6"' + (lugarResidencia === 'Puntarenas' ? ' selected' : '') + '>Puntarenas</option>' +
+                '<option value="7"' + (lugarResidencia === 'Limón' ? ' selected' : '') + '>Limón</option>' +
+                '</select>' +
+                '<input id="direccion" class="swal2-input" placeholder="Dirección" value="' + direccion + '">' +
+                '<input id="contrasena" type="password" class="swal2-input" placeholder="Contraseña">',
             focusConfirm: false,
             showCancelButton: true,
             confirmButtonText: 'Guardar',
@@ -99,17 +142,19 @@
                 const tipoCliente = Swal.getPopup().querySelector('#tipo-cliente').value;
                 const lugarResidencia = Swal.getPopup().querySelector('#lugar-residencia').value;
                 const direccion = Swal.getPopup().querySelector('#direccion').value;
+                const contrasena = Swal.getPopup().querySelector('#contrasena').value;
                 console.log('Cédula:', cedula);
                 console.log('Nombre:', nombre);
                 console.log('Apellido:', apellido);
                 console.log('Tipo de Cliente:', tipoCliente);
                 console.log('Lugar de Residencia:', lugarResidencia);
                 console.log('Dirección:', direccion);
-                if (!cedula || !nombre || !apellido || !tipoCliente || !lugarResidencia || !direccion) {
+                console.log('Contraseña:', contrasena);
+                if (!cedula || !nombre || !apellido || !tipoCliente || !lugarResidencia || !direccion || !contrasena) {
                     Swal.showValidationMessage('Por favor, completa todos los campos');
                 } else {
-                    console.log('Datos del formulario: Cédula:', cedula, 'Nombre:', nombre, 'Apellido:', apellido, 'Tipo de Cliente:', tipoCliente, 'Lugar de Residencia:', lugarResidencia, 'Dirección:', direccion);
-                    return { cedula: cedula, nombre: nombre, apellido: apellido, tipoCliente: tipoCliente, lugarResidencia: lugarResidencia, direccion: direccion };
+                    console.log('Datos del formulario: Cédula:', cedula, 'Nombre:', nombre, 'Apellido:', apellido, 'Tipo de Cliente:', tipoCliente, 'Lugar de Residencia:', lugarResidencia, 'Dirección:', direccion, 'Contraseña:', contrasena);
+                    return { cedula: cedula, nombre: nombre, apellido: apellido, tipoCliente: tipoCliente, lugarResidencia: lugarResidencia, direccion: direccion, contrasena: contrasena };
                 }
             }
         }).then((result) => {

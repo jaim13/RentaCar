@@ -1,10 +1,14 @@
 //ModifiCarsmodel.js
 const db = require('../config'); // Importa el módulo para interactuar con la base de datos
+const sql = require('mssql');
+const sqlConfig = require('../config1');
+
 
 async function obtenerIdsRelacionadas(vehiculoId) {
     try {
         const queryString = `SELECT TipoVehiculoID, ColorID, CombustibleID, TransmisionID, PlacasID, ModeloID, MarcaID, AnoID, PuertasID FROM Vehiculos WHERE VehiculoID = '${vehiculoId}'`;
         const result = await db.query(queryString);
+        console.log('Resultado de la consulta obtenerIdsRelacionadas:', result); // Agregado para verificar el resultado de la consulta
         if (result.length > 0) {
             const idsRelacionadas = {
                 TipoVehiculoID: result[0].TipoVehiculoID,
@@ -27,7 +31,6 @@ async function obtenerIdsRelacionadas(vehiculoId) {
     }
 }
 
-
 async function actualizarTipoVehiculo(tipoVehiculoID, nuevoTipo) {
     try {
         const query = `UPDATE TipoVehiculo SET Tipo = @NuevoTipo WHERE TipoVehiculoID = @TipoVehiculoID`;
@@ -35,19 +38,21 @@ async function actualizarTipoVehiculo(tipoVehiculoID, nuevoTipo) {
             NuevoTipo: nuevoTipo,
             TipoVehiculoID: tipoVehiculoID
         });
-
+        console.log('Resultado de la actualización actualizarTipoVehiculo:', result); // Agregado para verificar el resultado de la actualización
         return result;
     } catch (error) {
         throw new Error('Error al actualizar el tipo de vehículo:', error);
     }
 }
 
-async function actualizarColor(colorID, nuevoColor) {
+async function actualizarCombustible(CombustibleID, Tipo) {
     try {
-        const query = `UPDATE Color SET Color = @NuevoColor WHERE ColorID = @ColorID`;
+        console.log('Id combustible en el model: ',CombustibleID);
+        console.log('Tipo en el model combustible: ',Tipo);
+        const query = `UPDATE Combustible SET Tipo = @Tipo WHERE CombustibleID = @CombustibleID`;
         const result = await db.query(query, {
-            NuevoColor: nuevoColor,
-            ColorID: colorID
+            Tipo: Tipo,
+            CombustibleID: CombustibleID
         });
 
         return result;
@@ -56,12 +61,13 @@ async function actualizarColor(colorID, nuevoColor) {
     }
 }
 
-async function actualizarCombustible(CombustibleID, Tipo) {
+
+async function actualizarColor(colorID, nuevoColor) {
     try {
-        const query = `UPDATE Combustible SET Tipo = @Tipo WHERE CombustibleID = @CombustibleID`;
+        const query = `UPDATE Color SET Color = @NuevoColor WHERE ColorID = @ColorID`;
         const result = await db.query(query, {
-            Tipo: Tipo,
-            CombustibleID: CombustibleID
+            NuevoColor: nuevoColor,
+            ColorID: colorID
         });
 
         return result;
@@ -156,13 +162,14 @@ async function actualizarPuertas(PuertasID, Puertas) {
 
 async function actualizarCostosYDisponibilidad(vehiculoID, nuevosCostos, nuevaDisponibilidad) {
     try {
-        console.log('Disponibilidad del vehiculo: ',nuevaDisponibilidad);
+        console.log('Disponibilidad del vehiculo: ', nuevaDisponibilidad);
         var disponible;
         if (nuevaDisponibilidad === true) {
             disponible = 'Si';
         } else {
             disponible = 'No';
         }
+        console.log('Valor de disponible: ', disponible); // Agregado para verificar el valor de disponible
         const query = `
             UPDATE Vehiculos 
             SET Costos = @NuevosCostos, Disponible = @disponible 
@@ -173,10 +180,102 @@ async function actualizarCostosYDisponibilidad(vehiculoID, nuevosCostos, nuevaDi
             disponible: disponible,
             VehiculoID: vehiculoID
         });
-
+        console.log('Resultado de la actualización: ', result); // Agregado para verificar el resultado de la actualización
         return result;
     } catch (error) {
         throw new Error('Error al actualizar los costos y la disponibilidad:', error);
+    }
+}
+
+async function eliminarRegistroPorAlquilerID(AlquilerID) {
+    try {
+        const query = `DELETE FROM Alquileres WHERE AlquilerID = @AlquilerID`; 
+        const result = await db.query(query, { AlquilerID });
+
+        if (result && result.rowsAffected && result.rowsAffected[0] === 1) {
+            return true; // Indica que el registro fue eliminado correctamente
+        } else if (result && result.rowsAffected && result.rowsAffected[0] === 0) {
+            return false; // Indica que el registro no existe
+        } else {
+            return false; // En caso de otros errores
+        }
+    } catch (error) {
+        console.error('Error al eliminar el registro por AlquilerID:', error);
+        throw error;
+    }
+}
+
+async function obtenerAlquilerIDPorVehiculoID(VehiculoID) {
+    try {
+        const query = `SELECT AlquilerID FROM Alquileres WHERE VehiculoID = @VehiculoID`;
+        const result = await db.query(query, { VehiculoID });
+
+        if (result.length > 0) {
+            return result[0].AlquilerID;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error('Error al obtener la AlquilerID por VehiculoID:', error);
+        throw error;
+    }
+}
+
+async function eliminarVehiculoPorId(VehiculoID) {
+    try {
+        console.log('Intentando eliminar vehículo con ID:', VehiculoID);
+
+        await sql.connect(sqlConfig);
+
+        const result = await sql.query`
+            DELETE FROM Vehiculos
+            WHERE VehiculoID = ${VehiculoID}
+        `;
+
+        if (result.rowsAffected[0] === 1) {
+            return true; // Indica que el vehículo fue eliminado correctamente
+        } else {
+            return false; // Indica que el vehículo no existe
+        }
+    } catch (error) {
+        throw new Error(`Error al eliminar el vehículo: ${error.message}`);
+    } finally {
+        await sql.close();
+    }
+}
+async function eliminarCarPorId(VehiculoID) {
+    try {
+        let AlquilerID = await obtenerAlquilerIDPorVehiculoID(VehiculoID);
+        
+        if (AlquilerID) {
+            let resultAlquiler = await eliminarRegistroPorAlquilerID(AlquilerID);
+            console.log('Registro de alquiler eliminado correctamente');
+            
+            if (resultAlquiler) {
+                let resultVehiculo = await eliminarVehiculoPorId(VehiculoID);
+                if (resultVehiculo) {
+                    return 'El vehículo fue eliminado con éxito';
+                } else {
+                    console.log('No se pudo eliminar el vehículo');
+                    return null;
+                }
+            } else {
+                console.log('No se pudo eliminar el registro de alquiler');
+                return null;
+            }
+        } else {
+            console.log('No hay registro de alquiler asociado al vehículo');
+            let resultVehiculo = await eliminarVehiculoPorId(VehiculoID);
+            if (resultVehiculo) {
+                return 'El vehículo fue eliminado con éxito';
+            } else {
+                console.log('No se pudo eliminar el vehículo');
+                return null;
+            }
+        }
+    } catch (error) {
+        console.error(`Error al eliminar el vehículo: ${error.message}`);
+        return null;
     }
 }
 
@@ -191,5 +290,6 @@ module.exports = {
     actualizarMarca,
     actualizarAno,
     actualizarPuertas,
-    actualizarCostosYDisponibilidad
+    actualizarCostosYDisponibilidad,
+    eliminarCarPorId
 };

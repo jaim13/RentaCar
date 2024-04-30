@@ -1,5 +1,5 @@
 //rentavehiculosmodel.js
-
+const sql = require('mssql');
 const { poolPromise } = require('../config');
 
 async function obtenerCostoPorVehiculoID(vehiculoID) {
@@ -39,23 +39,27 @@ async function obtenerIDClientePorCedula(cedula) {
 }
 
 
-async function insertarAlquiler(ID_Cliente, VehiculoID, FechaInicio, FechaFin, ID_Seguro, MontoTotal) {
+async function insertarAlquiler(idCliente, vehiculoId, fechaHoy, fechaRenta, seguroRenta, costoTotal) {
     try {
         const pool = await poolPromise;
         const request = pool.request();
         const result = await request
-            .input('ID_Cliente', ID_Cliente)
-            .input('VehiculoID', VehiculoID)
-            .input('FechaInicio', FechaInicio)
-            .input('FechaFin', FechaFin)
-            .input('ID_Seguro', ID_Seguro)
-            .input('MontoTotal', MontoTotal)
-            .execute('InsertarAlquiler');
+            .input('idCliente', idCliente)
+            .input('vehiculoId', vehiculoId)
+            .input('fechaHoy', fechaHoy)
+            .input('fechaRenta', fechaRenta)
+            .input('seguroRenta', seguroRenta)
+            .input('costoTotal', costoTotal)
+            .execute('InsertAlquiler');
         return result;
     } catch (error) {
-        throw new Error(`Error al insertar alquiler: ${error.message}`);
+        throw new Error('Error al insertar el alquiler en la base de datos: ' + error.message);
     }
 }
+
+
+
+
 
 async function insertarTarjeta(Numero, TipoTarjetaID) {
     try {

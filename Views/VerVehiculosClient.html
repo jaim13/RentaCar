@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RentaCar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/StylesCarViews.css">
+</head>
+<body>
+    <header class="mb-5">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/Client">
+                    RentaCar 
+                    <i class="bi bi-car"></i>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="navbar-nav">
+                    <a class="nav-link" href="/WatchCars">Ver Vehiculos</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Lista de Vehículos</h1>
+        <ul id="listaVehiculos" class="list-group">
+            <!-- Aquí se mostrará la lista de vehículos -->
+        </ul>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+                function procesarRutaImagen(rutaImagen) {
+                    console.log('Ruta de imagen base en el front: ', rutaImagen);
+                    if (!rutaImagen) {
+                        return '';
+                    }
+
+                    var index = rutaImagen.lastIndexOf('uploads');
+                    if (index === -1) {
+                        return rutaImagen;
+                    }
+
+                    var rutaRelativa = rutaImagen.substring(index);
+
+                    return rutaRelativa.replace(/\\/g, '/');
+                }
+                $(document).ready(function() {
+    console.log('Ajax funcionando');
+    $.ajax({
+        url: '/api/vehiculos',
+        method: 'GET',
+        success: function(response) {
+            console.log('Vehiculos en el front: ', response.data); 
+            if (Array.isArray(response.data)) {
+                response.data.forEach(function(vehiculo) {
+                    if (vehiculo.Disponible === 'Si') {
+                        var urlImagen = procesarRutaImagen(vehiculo.ruta_imagen);
+                        console.log('ID del vehiculo en el html generado: ', vehiculo.VehiculoID);
+                        var vehiculoHTML = '<li class="list-group-item">' +
+                            '<div class="row">' +
+                            '<div class="col-md-4">';
+                        if (urlImagen) {
+                            vehiculoHTML += '<img src="' + urlImagen + '" alt="Imagen del vehículo";">';
+                        } else {
+                            vehiculoHTML += '<div class="image-not-available">Imagen no disponible</div>';
+                        }
+                        vehiculoHTML += '</div>' +
+                            '<div class="col-md-8">' +
+                            '<strong>Modelo:</strong> ' + vehiculo.Modelo + '<br>' +
+                            '<strong>Marca:</strong> ' + vehiculo.Marca + '<br>' +
+                            '<strong>Año:</strong> ' + vehiculo.Anos + '<br>' +
+                            '<strong>Color:</strong> ' + vehiculo.Color + '<br>' +
+                            '<strong>Combustible:</strong> ' + vehiculo.Combustible + '<br>' +
+                            '<strong>Costos:</strong> ' + vehiculo.Costos + '<br>' +
+                            '<strong>Disponible:</strong> ' + vehiculo.Disponible + '<br>' +
+                            '<strong>Placas:</strong> ' + vehiculo.Placas + '<br>' +
+                            '<strong>Puertas:</strong> ' + vehiculo.Puertas + '<br>' +
+                            '<strong>Tipo de Vehículo:</strong> ' + vehiculo.TipoVehiculo + '<br>' +
+                            '<strong>Transmisión:</strong> ' + vehiculo.Transmision + '<br>' +
+                            '<button class="btn btn-primary rentar-btn" data-id="' + vehiculo.VehiculoID + '">Rentar</button>'+
+                            '</div>' +
+                            '</div>' +
+                            '</li>';
+                        $('#listaVehiculos').append(vehiculoHTML);
+                    }
+                });
+            } else {
+                console.error('Error: La propiedad "data" no es un array.');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al obtener la lista de vehículos:', error);
+        }
+    });
+});
+                $(document).on('click', '.rentar-btn', function() {
+    console.log('Botón de rentar clickeado');
+    var vehiculoId = $(this).data('id');
+    console.log('Id del vehiculo al click: ',vehiculoId);
+    Swal.fire({
+        title: 'Rentar Vehículo',
+        html:
+            '<input id="cedula" class="swal2-input" placeholder="Cedula">' +
+            '<input id="email" class="swal2-input" placeholder="Email">' +
+            '<input id="numero-tarjeta" class="swal2-input" placeholder="Número de Tarjeta">' +
+            '<input id="fecha-renta" type="date" class="swal2-input">' +
+            '<select id="seguro-renta" class="swal2-select">' +
+            '<option value="1">Premiun +$1000</option>' +
+            '<option value="2">Basic +$500</option>' +
+            '<option value="3">Sin Seguro</option>' +
+            '</select>' +
+            '<select id="tipo-tarjeta" class="swal2-select">' +
+            '<option value="1">Visa</option>' +
+            '<option value="2">Mastercard</option>' +
+            '<option value="3">American Express</option>' +
+            '</select>',
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Rentar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+            const cedula = Swal.getPopup().querySelector('#cedula').value;
+            const email = Swal.getPopup().querySelector('#email').value;
+            const numeroTarjeta = Swal.getPopup().querySelector('#numero-tarjeta').value;
+            const fechaRenta = Swal.getPopup().querySelector('#fecha-renta').value;
+            const seguroRenta = Swal.getPopup().querySelector('#seguro-renta').value;
+            const tipoTarjeta = Swal.getPopup().querySelector('#tipo-tarjeta').value;
+            console.log('Cedula:', cedula);
+            console.log('Número de Tarjeta:', numeroTarjeta);
+            console.log('Fecha de renta:', fechaRenta);
+            console.log('Seguro de renta:', seguroRenta);
+            if (!cedula || !email || !numeroTarjeta || !fechaRenta || !seguroRenta || !tipoTarjeta) {
+                Swal.showValidationMessage('Por favor, completa todos los campos');
+            } else {
+                console.log('Datos del formulario: Cedula:', cedula,'Email para enviar correo:',email, 'Número de Tarjeta:', numeroTarjeta, 'Fecha de renta:', fechaRenta, 'Seguro de renta:', seguroRenta, 'Tipo de Tarjeta:', tipoTarjeta);
+                return { cedula: cedula,email: email, numeroTarjeta: numeroTarjeta, fechaRenta: fechaRenta, seguroRenta: seguroRenta, tipoTarjeta: tipoTarjeta };
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            console.log('Rentar vehículo con ID:', vehiculoId);
+            console.log('Datos del formulario:', result.value); 
+            $.ajax({
+                url: '/api/renta_vehiculo',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ vehiculoId: vehiculoId, formData: result.value }),
+                success: function(response) {
+                    console.log('Respuesta del servidor:', response);
+                    Swal.fire(
+                        'Rentado!',
+                        'El vehículo ha sido rentado con éxito.',
+                        'success'
+                        ).then(() => {
+                        // Recargar la página para mostrar los cambios actualizados
+                        location.reload();
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error al rentar el vehículo:', error);
+                    Swal.fire(
+                        'Error',
+                        'Hubo un error al rentar el vehículo.',
+                        'error'
+                    );
+                }
+            });
+        }
+    });
+});
+    </script>
+</body>
+</html>
