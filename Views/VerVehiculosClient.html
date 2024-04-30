@@ -30,6 +30,24 @@
 
     <div class="container mt-5">
         <h1 class="mb-4">Lista de Vehículos</h1>
+        <nav class="navbar bg-body-tertiary">
+            <div class="container-fluid">
+                <form class="d-flex" role="search">
+                    <select id="tipoVehiculo" class="form-select me-2" aria-label="Tipo de vehículo">
+                        <option value="" selected disabled>Seleccionar tipo de vehículo</option>
+                        <option value="">Mostrar todos</option>
+                        <option value="Sedan">Sedán</option>
+                        <option value="SUV">SUV</option>
+                        <option value="PickUp">Pickup</option>
+                        <option value="Camioneta">Camioneta</option>
+                        <option value="Deportivo">Deportivo</option>
+                        <option value="Moto">Moto</option>
+                        <option value="Carga Pesada">Carga pesada</option>
+                        <option value="Van">Van</option>
+                    </select>                    
+                </form>
+            </div>
+        </nav>
         <ul id="listaVehiculos" class="list-group">
             <!-- Aquí se mostrará la lista de vehículos -->
         </ul>
@@ -64,7 +82,7 @@
                     if (vehiculo.Disponible === 'Si') {
                         var urlImagen = procesarRutaImagen(vehiculo.ruta_imagen);
                         console.log('ID del vehiculo en el html generado: ', vehiculo.VehiculoID);
-                        var vehiculoHTML = '<li class="list-group-item">' +
+                        var vehiculoHTML = '<li class="list-group-item" data-tipo="' + vehiculo.TipoVehiculo + '">'+
                             '<div class="row">' +
                             '<div class="col-md-4">';
                         if (urlImagen) {
@@ -100,6 +118,18 @@
             console.error('Error al obtener la lista de vehículos:', error);
         }
     });
+    $('#tipoVehiculo').change(function() {
+                var tipoSeleccionado = $(this).val();
+                if (tipoSeleccionado === '') {
+                    // Mostrar todos los vehículos
+                    $('.list-group-item').show();
+                } else {
+                    // Ocultar todos los vehículos
+                    $('.list-group-item').hide();
+                    // Mostrar solo los vehículos del tipo seleccionado
+                    $('.list-group-item[data-tipo="' + tipoSeleccionado + '"]').show();
+                }
+            });
 });
                 $(document).on('click', '.rentar-btn', function() {
     console.log('Botón de rentar clickeado');

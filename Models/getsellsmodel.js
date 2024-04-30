@@ -8,9 +8,9 @@ async function obtenerSumaVentasDelDia(fecha) {
         const pool = await poolPromise;
         const request = pool.request();
         const query = `
-            SELECT SUM(MontoTotal) AS SumaMontoTotal
-            FROM Alquileres
-            WHERE CONVERT(date, FechaInicio) = @fecha
+        SELECT SUM(MontoTotal) AS SumaMontoTotal
+        FROM Alquileres
+        WHERE CONVERT(date, FechaInicio) = @fecha
         `;
         const result = await request.input('fecha', fecha).query(query);
         console.log('Resultado de la consulta:', result.recordset[0]);
